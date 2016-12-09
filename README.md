@@ -1,7 +1,7 @@
 ### 项目目录：
 - home.html
 - filter.html
-- detais.html
+- details.html
 - user.html
 - msg_success.html
 - msg_warn.html
