@@ -93,20 +93,25 @@
                 }
             ],
             navdata:["全部", "出租", "出售", "求购", "求租"],
+            pagenumb:1,
             getData: function(type, page){
                 var that = this;
                 $.ajax({
-                  type: 'GET',
-                  url: '/projects',
-                  data: { typ: type, page:page },
-                  dataType: 'json',
-                  timeout: 300,
-                  success: function(data){
-                    that.data = data;
-                  },
-                  error: function(xhr, type){
-                    alert('Ajax error!')
-                  }
+                    type: 'GET',
+                    url: '/projects',
+                    data: { typ: type, page:page },
+                    dataType: 'json',
+                    timeout: 300,
+                    success: function(data){
+                        if (!!data) {
+                            that.data = data;
+                        }else{
+                            window.pageManager.go("msg_warn");
+                        }
+                    },
+                    error: function(xhr, type){
+                        window.pageManager.go("msg_warn");
+                    }
                 })
             },
             cacheDom: function(){
@@ -138,7 +143,9 @@
                     event.preventDefault();
                     that.showLoading();
                     setTimeout(function(){
-                        that.renderList(that.data);
+                        that.pagenumb++;
+                        var nowdata = [];
+                        that.renderList(nowdata, that.pagenumb);
                         that.hideLoading();
                     }, 1500);
                 });
@@ -147,15 +154,27 @@
                 var that = this;
                 this.$list.empty();
                 $.showLoading();
+                this.$loadmore.hide();
+                that.$myScroll.scrollTo(0, 0, 800, IScroll.utils.ease.quadratic);
                 setTimeout(function () {
                     $.hideLoading();
-                    that.renderList(that.data);
-                    that.$myScroll.scrollTo(0, 0, 800, IScroll.utils.ease.quadratic);
+                    that.pagenumb = 1;
+                    that.renderList(that.data, that.pagenumb);
+                    that.$loadmore.show();
                 }, 1000);
             },
-            renderList: function(d){
+            renderList: function(d, page){
+                console.log(page);
                 var that = this;
-                if (!!d) {
+                if (d.length == 0) {
+                    if (page == 1) {
+                        this.$list.append('<div class="weui-msg"><div class="weui-msg__icon-area"><i class="weui-icon-warn weui-icon_msg"></i></div><div class="weui-msg__text-area"><h2 class="weui-msg__title text-grey">没有数据~~</h2></div></div>');
+                        that.$loadmore.hide();
+                    }else{
+                        that.$loadmore.html('没有了~');
+                    }
+                }else{
+                    that.$loadmore.show().html('加载更多');
                     for (var i = 0; i < d.length; i++) {
                         var spec = '';
                         for (var j = 0; j < d[i].spec.length; j++) {
@@ -187,8 +206,6 @@
                         +'  </li>';
                         this.$list.append(html);
                     }
-                }else{
-                    window.pageManager.go("msg_warn");
                 }
                 this.$myScroll.refresh();
                 this.$list.find('li').children('.weui-panel').off('click').on('click', function(){
@@ -200,7 +217,7 @@
                 this.$loadmore.addClass('loading').html('<span class="loader"></span> 正在加载中...');
             },
             hideLoading: function(){
-                this.$loadmore.removeClass('loading').html('加载更多');
+                this.$loadmore.removeClass('loading');
             },
             init: function(){
                 var that = this, nav = '', w = 0;
@@ -337,7 +354,7 @@
 </div>
 <script type="text/javascript">
     $(function(){
-        $('.hide-cell').hide();
+        $('.filter .hide-cell').hide();
         var myScroll02 = new IScroll('.filter #wrapper', { scrollX: false, scrollY: true, click: true});
         //热门城市, 房源类型
         $('.btn-group').each(function(index, el) {
@@ -347,40 +364,40 @@
                 $(this).addClass('active');
                 if ($this.attr('id') == "hotCities") {
                     var txt = $(this).text();
-                    $('#result').html(txt);
+                    $('.filter #result').html(txt);
                 }
             });
         });
-        $('#mylocation').click(function(event) {
+        $('.filter #mylocation').click(function(event) {
             $.showLoading();
             setTimeout(function(){
                 $.hideLoading();
-                $('#result').html('武汉');
-                $('#hotCities').find('li').removeClass('active');
+                $('.filter #result').html('武汉');
+                $('.filter #hotCities').find('li').removeClass('active');
             }, 1000);
         });
         $.confirm("获取您所在的位置？", function() {
-            $('#result').html('武汉');
+            $('.filter #result').html('武汉');
         }, function() {
           //点击取消后的回调函数
         });
         //选择城市
-        $("#city-picker").on('click', function(event) {
+        $(".filter #city-picker").on('click', function(event) {
             event.preventDefault();
-            $('#my-area').fadeIn(function(){
-                $("#cities").CityPicker({
+            $('.filter #my-area').fadeIn(function(){
+                $(".filter #cities").CityPicker({
                   getCity: function(pro, city){
-                    $('#result').html(pro + ' ' + city);
-                    $('#hotCities').find('li').removeClass('active');
-                    $('#my-area').fadeOut();
-                    $('#cities').empty();
+                    $('.filter #result').html(pro + ' ' + city);
+                    $('.filter #hotCities').find('li').removeClass('active');
+                    $('.filter #my-area').fadeOut();
+                    $('.filter #cities').empty();
                   }
                 });
             });
         });
 
         //设置价格
-        $('#switchCP').on('click', function(event) {
+        $('.filter #switchCP').off().on('click', function(event) {
             event.preventDefault();
             var switchbox = $(this).find('input[type="checkbox"]');
             if (switchbox.prop('checked') == true) {
@@ -391,7 +408,7 @@
                 switchbox.prop('checked', true).attr('checked', 'checked');
                 $('.hide-cell').show();
                 $('.hide-cell .weui-check__label').each(function(index, el) {
-                    $(this).on('click', function(event) {
+                    $(this).off().on('click', function(event) {
                         event.preventDefault();
                         var checkbox = $(this).find('input[type="checkbox"]');
                         if (checkbox.prop('checked') == true) {
@@ -401,7 +418,7 @@
                         }
                     });
                 });
-                $('#saveBtn').addClass('btn-danger').removeClass('btn-disabled').on('click', function(){
+                $('.filter #saveBtn').addClass('btn-danger').removeClass('btn-disabled').on('click', function(){
                     if ($("#result").html() == "未选") {
                         $.toast("您还未选择城市", "text");
                     }else{

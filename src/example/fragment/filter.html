@@ -111,7 +111,7 @@
 </div>
 <script type="text/javascript">
     $(function(){
-        $('.hide-cell').hide();
+        $('.filter .hide-cell').hide();
         var myScroll02 = new IScroll('.filter #wrapper', { scrollX: false, scrollY: true, click: true});
         //热门城市, 房源类型
         $('.btn-group').each(function(index, el) {
@@ -121,40 +121,40 @@
                 $(this).addClass('active');
                 if ($this.attr('id') == "hotCities") {
                     var txt = $(this).text();
-                    $('#result').html(txt);
+                    $('.filter #result').html(txt);
                 }
             });
         });
-        $('#mylocation').click(function(event) {
+        $('.filter #mylocation').click(function(event) {
             $.showLoading();
             setTimeout(function(){
                 $.hideLoading();
-                $('#result').html('武汉');
-                $('#hotCities').find('li').removeClass('active');
+                $('.filter #result').html('武汉');
+                $('.filter #hotCities').find('li').removeClass('active');
             }, 1000);
         });
         $.confirm("获取您所在的位置？", function() {
-            $('#result').html('武汉');
+            $('.filter #result').html('武汉');
         }, function() {
           //点击取消后的回调函数
         });
         //选择城市
-        $("#city-picker").on('click', function(event) {
+        $(".filter #city-picker").on('click', function(event) {
             event.preventDefault();
-            $('#my-area').fadeIn(function(){
-                $("#cities").CityPicker({
+            $('.filter #my-area').fadeIn(function(){
+                $(".filter #cities").CityPicker({
                   getCity: function(pro, city){
-                    $('#result').html(pro + ' ' + city);
-                    $('#hotCities').find('li').removeClass('active');
-                    $('#my-area').fadeOut();
-                    $('#cities').empty();
+                    $('.filter #result').html(pro + ' ' + city);
+                    $('.filter #hotCities').find('li').removeClass('active');
+                    $('.filter #my-area').fadeOut();
+                    $('.filter #cities').empty();
                   }
                 });
             });
         });
 
         //设置价格
-        $('#switchCP').on('click', function(event) {
+        $('.filter #switchCP').off().on('click', function(event) {
             event.preventDefault();
             var switchbox = $(this).find('input[type="checkbox"]');
             if (switchbox.prop('checked') == true) {
@@ -165,7 +165,7 @@
                 switchbox.prop('checked', true).attr('checked', 'checked');
                 $('.hide-cell').show();
                 $('.hide-cell .weui-check__label').each(function(index, el) {
-                    $(this).on('click', function(event) {
+                    $(this).off().on('click', function(event) {
                         event.preventDefault();
                         var checkbox = $(this).find('input[type="checkbox"]');
                         if (checkbox.prop('checked') == true) {
@@ -175,7 +175,7 @@
                         }
                     });
                 });
-                $('#saveBtn').addClass('btn-danger').removeClass('btn-disabled').on('click', function(){
+                $('.filter #saveBtn').addClass('btn-danger').removeClass('btn-disabled').on('click', function(){
                     if ($("#result").html() == "未选") {
                         $.toast("您还未选择城市", "text");
                     }else{
