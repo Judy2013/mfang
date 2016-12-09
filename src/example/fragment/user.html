@@ -1,0 +1,76 @@
+<div class="page">
+    <div class="alert alert_danger">会员到期时间：</div>
+    <div class="page__bd page__bd_spacing">
+        <p>开通会员立享<span class="text-red">58同城、赶集网、房天下、亿房网、百姓网等多渠道个人房源信息！</span></p>
+    </div>
+    <div class="wrapper" id="wrapper" style="top: 135px;">
+        <div class="scroller">
+            <ul class="list_discount"></ul>
+            <div class="spacing"></div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        var $user = $('.user'), list = '';
+        var data = {
+                isUser:true,
+                expired:"2016年12月21日 21:32:21",
+                discount:[
+                    {
+                        id:1,
+                        dis:"9元",
+                        old:"15元",
+                        new:"6折"
+                    },
+                    {
+                        id:2,
+                        dis:"25",
+                        old:"45元",
+                        new:"5折"
+                    },
+                    {
+                        id:3,
+                        dis:"7元",
+                        old:"15元",
+                        new:"6折"
+                    },
+                    {
+                        id:4,
+                        dis:"7元",
+                        old:"15元",
+                        new:"6折"
+                    },
+                    {
+                        id:5,
+                        dis:"7元",
+                        old:"15元",
+                        new:"6折"
+                    },
+                    {
+                        id:6,
+                        dis:"7元",
+                        old:"15元",
+                        new:"6折"
+                    },
+                    {
+                        id:7,
+                        dis:"7元",
+                        old:"15元",
+                        new:"6折"
+                    }
+                ]
+            };
+            if (data.isUser) {
+                $user.find('.alert').html('会员到期时间：' + data.expired);
+            }else{
+                $user.find('.alert').html('暂未开通会员');
+            }
+            for (var i = 0; i < data.discount.length; i++) {
+                var html = '<li><a href="javascript:;">'+data.discount[i].dis+'/月<span><del>原价'+data.discount[i].old+'</del> 立享'+data.discount[i].new+'优惠</span></a></li>';
+                list += html;
+            }
+            $user.find('.list_discount').html(list);
+            var myScroll02 = new IScroll('.user #wrapper', { scrollX: false, scrollY: true, click: true});
+    });
+</script>

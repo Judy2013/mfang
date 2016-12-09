@@ -1,0 +1,192 @@
+<div class="page">
+    <div class="wrapper" id="wrapper" style="padding: 0; bottom: 55px;">
+        <div class="scroller">
+            <div class="weui-cells">
+                <div class="weui_cell weui-cell_access" id="city-picker">
+                    <div class="weui_cell_hd"><label for="date" class="weui_label">选择城市</label></div>
+                    <div class="weui_cell_bd weui_cell_primary text-right text-grey" id="result">未选</div>
+                    <div class="weui-cell__ft">
+                        <span style="vertical-align:middle; font-size: 14px;"></span>
+                    </div>
+                  </div>
+            </div>
+            <div class="weui-panel weui-panel_access">
+                <div class="weui-panel__bd">
+                    <div class="weui-media-box weui-media-box_text">
+                        <h4 class="weui-media-box__title">热门城市 <span class="weui-fr text-grey font14" id="mylocation"><img src="images/location.png" alt="">我的位置</span></h4>
+                        <ul class="list-inline btn-group" id="hotCities">
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">北京</a></li>
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">上海</a></li>
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">广州</a></li>
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">深圳</a></li>
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">南京</a></li>
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">武汉</a></li>
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">成都</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="weui-panel weui-panel_access">
+                <div class="weui-panel__bd">
+                    <div class="weui-media-box weui-media-box_text">
+                        <h4 class="weui-media-box__title">房源类型</h4>
+                        <ul class="list-inline btn-group">
+                            <li class="active"><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">住宅</a></li>
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">写字楼</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="weui-cells weui-cells_checkbox">
+                <div class="weui-cell weui-cell_switch">
+                    <div class="weui-cell__bd">房源需求</div>
+                    <div class="weui-cell__ft">
+                        <span style="vertical-align:middle; font-size: 14px;margin-right: 10px;">设置价格</span>
+                        <label for="switchCP" class="weui-switch-cp" id="switchCP">
+                            <input class="weui-switch-cp__input" type="checkbox" />
+                            <div class="weui-switch-cp__box"></div>
+                        </label>
+                    </div>
+                </div>
+                <div class="weui-cell hide-cell">
+                    <label class="weui-check__label" for="s11">
+                        <div class="weui-cell__hd">
+                            <input type="checkbox" class="weui-check" name="checkbox1" id="s11" checked="checked">
+                            <i class="weui-icon-checked"></i>出售
+                        </div>
+                    </label>
+                    <label class="ml10">
+                        <span class="text-grey font14 text-2">最高单价</span><input class="weui-input" type="text" placeholder=""><span class="text-grey font14">元/㎡</span>
+                    </label>
+                    <label class="ml10">
+                        <span class="text-grey font14 text-2">最低总价</span><input class="weui-input" type="text" placeholder=""><span class="text-grey font14">万元</span>
+                    </label>
+                </div>
+                <div class="weui-cell hide-cell">
+                    <label class="weui-check__label" for="s12">
+                        <div class="weui-cell__hd">
+                            <input type="checkbox" class="weui-check" name="checkbox1" id="s12">
+                            <i class="weui-icon-checked"></i>出租
+                        </div>
+                    </label>
+                    <label class="ml10">
+                        <span class="text-grey font14 text-2">最低单价</span><input class="weui-input" type="text" placeholder=""><span class="text-grey font14">元/月</span>
+                    </label>
+                </div>
+                <div class="weui-cell hide-cell">
+                    <label class="weui-check__label" for="s13">
+                        <div class="weui-cell__hd">
+                            <input type="checkbox" class="weui-check" name="checkbox1" id="s13">
+                            <i class="weui-icon-checked"></i>求购
+                        </div>
+                    </label>
+                    <label class="ml10">
+                        <span class="text-grey font14 text-2">最高总价</span><input class="weui-input" type="text" placeholder=""><span class="text-grey font14">万元</span>
+                    </label>
+                    <label class="ml10">
+                        <span class="text-grey font14 text-2">最高单价</span><input class="weui-input" type="text" placeholder=""><span class="text-grey font14">元/㎡</span>
+                    </label>
+                </div>
+                <div class="weui-cell hide-cell">
+                    <label class="weui-check__label" for="s14">
+                        <div class="weui-cell__hd">
+                            <input type="checkbox" class="weui-check" name="checkbox1" id="s14">
+                            <i class="weui-icon-checked"></i>求租
+                        </div>
+                    </label>
+                    <label class="ml10">
+                        <span class="text-grey font14 text-2">最高单价</span><input class="weui-input" type="text" placeholder=""><span class="text-grey font14">元/月</span>
+                    </label>
+                </div>
+            </div>
+            <div class="spacing"></div>
+        </div>
+    </div>
+    <div id="my-area" class="am-popup">
+        <div id="cities"></div>
+    </div>
+    <div class="btn-bottom">
+        <a href="javascript:;" class="btn btn-disabled" id="saveBtn">保存设置</a>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        $('.hide-cell').hide();
+        var myScroll02 = new IScroll('.filter #wrapper', { scrollX: false, scrollY: true, click: true});
+        //热门城市, 房源类型
+        $('.btn-group').each(function(index, el) {
+            var $this = $(this);
+            $this.children('li').click(function(event) {
+                $this.children('li').removeClass('active');
+                $(this).addClass('active');
+                if ($this.attr('id') == "hotCities") {
+                    var txt = $(this).text();
+                    $('#result').html(txt);
+                }
+            });
+        });
+        $('#mylocation').click(function(event) {
+            $.showLoading();
+            setTimeout(function(){
+                $.hideLoading();
+                $('#result').html('武汉');
+                $('#hotCities').find('li').removeClass('active');
+            }, 1000);
+        });
+        $.confirm("获取您所在的位置？", function() {
+            $('#result').html('武汉');
+        }, function() {
+          //点击取消后的回调函数
+        });
+        //选择城市
+        $("#city-picker").on('click', function(event) {
+            event.preventDefault();
+            $('#my-area').fadeIn(function(){
+                $("#cities").CityPicker({
+                  getCity: function(pro, city){
+                    $('#result').html(pro + ' ' + city);
+                    $('#hotCities').find('li').removeClass('active');
+                    $('#my-area').fadeOut();
+                    $('#cities').empty();
+                  }
+                });
+            });
+        });
+
+        //设置价格
+        $('#switchCP').on('click', function(event) {
+            event.preventDefault();
+            var switchbox = $(this).find('input[type="checkbox"]');
+            if (switchbox.prop('checked') == true) {
+                switchbox.prop('checked', false).removeAttr('checked');
+                $('.hide-cell').hide();
+                $('#saveBtn').addClass('btn-disabled').removeClass('btn-danger').off();
+            }else{
+                switchbox.prop('checked', true).attr('checked', 'checked');
+                $('.hide-cell').show();
+                $('.hide-cell .weui-check__label').each(function(index, el) {
+                    $(this).on('click', function(event) {
+                        event.preventDefault();
+                        var checkbox = $(this).find('input[type="checkbox"]');
+                        if (checkbox.prop('checked') == true) {
+                            checkbox.prop('checked', false).removeAttr('checked');
+                        }else{
+                            checkbox.prop('checked', true).attr('checked', 'checked');
+                        }
+                    });
+                });
+                $('#saveBtn').addClass('btn-danger').removeClass('btn-disabled').on('click', function(){
+                    if ($("#result").html() == "未选") {
+                        $.toast("您还未选择城市", "text");
+                    }else{
+                        $.toast("操作成功");
+                        setTimeout(function(){
+                            window.pageManager.go("home");
+                        }, 2500);
+                    }
+                });
+            }
+            myScroll02.refresh();
+        });    
+    });
+</script>

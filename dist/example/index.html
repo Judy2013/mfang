@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>秒房</title>
+    <link rel="stylesheet" href="../style/weui.min.css"/>
+    <link rel="stylesheet" href="./example.css"/>
+    <link rel="stylesheet" href="../style/jquery-weui.min.css"/>
+</head>
+<body ontouchstart>
+    <div class="weui-toptips weui-toptips_warn js_tooltips">错误提示</div>
+
+    <div class="container" id="container"></div>
+
+    <script type="text/html" id="tpl_home">
+<div class="page">
+    <a class="alert alert_warning" onclick="window.pageManager.go('user');">限时9元加入会员，立享多渠道个人房源推送 > <span class="close" id="closeAlert">X</span></a>
+    <div class="wrapper" id="navbar" style="position: relative; padding: 0; padding-right: 60px; height: 55px; background-color: #f15846;">
+        <div class="scroller" style="position: absolute; width: 380px;">
+            <ul class="list-nav" id="navlist"></ul>
+        </div>
+        <a href="javascript:;"  onclick="window.pageManager.go('filter');" class="btn-filter" style="position: absolute; right: 0; top: 0; z-index: 10;"></a>
+    </div>
+    <div class="wrapper" id="wrapper" style="padding: 0; top: 100px;">
+        <div class="scroller">
+            <ul id="eventList"></ul>
+            <a href="javascript:;" class="weui-btn-link text-grey" id="loadmore">加载更多</a>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        var navbar = new IScroll('#navbar', { scrollX: true, scrollY: false, click: true});
+        
+        //点击导航，加载列表
+        var creatlist = {
+            data:[
+                {
+                    id:1,
+                    url:"details",
+                    title:"九峰社区德欣里 3室2厅1卫",
+                    loc:"常青-金盾花园",
+                    spec:["住宅","148㎡","4室2厅2卫"],
+                    price:"87万",
+                    sourceImg:"images/icon_tabbar.png",
+                    source:"赶集网",
+                    time:"1分钟前发布"
+                },
+                {
+                    id:2,
+                    url:"details",
+                    title:"九峰社区德欣里 3室2厅1卫",
+                    loc:"常青-金盾花园",
+                    spec:["住宅","148㎡","4室2厅2卫"],
+                    price:"53.2万",
+                    sourceImg:"images/icon_tabbar.png",
+                    source:"赶集网",
+                    time:"1分钟前发布"
+                },
+                {
+                    id:3,
+                    url:"details",
+                    title:"九峰社区德欣里 3室2厅1卫",
+                    loc:"常青-金盾花园",
+                    spec:["住宅","148㎡","4室2厅2卫"],
+                    price:"64.3万",
+                    sourceImg:"images/icon_tabbar.png",
+                    source:"赶集网",
+                    time:"1分钟前发布"
+                },
+                {
+                    id:4,
+                    url:"details",
+                    title:"九峰社区德欣里 3室2厅1卫",
+                    loc:"常青-金盾花园",
+                    spec:["住宅","148㎡","4室2厅2卫"],
+                    price:"124.4万",
+                    sourceImg:"images/icon_tabbar.png",
+                    source:"赶集网",
+                    time:"1分钟前发布"
+                },
+                {
+                    id:5,
+                    url:"details",
+                    title:"九峰社区德欣里 3室2厅1卫",
+                    loc:"常青-金盾花园",
+                    spec:["住宅","148㎡","4室2厅2卫"],
+                    price:"122.2万",
+                    sourceImg:"images/icon_tabbar.png",
+                    source:"赶集网",
+                    time:"1分钟前发布"
+                }
+            ],
+            navdata:["全部", "出租", "出售", "求购", "求租"],
+            getData: function(type, page){
+                var that = this;
+                $.ajax({
+                  type: 'GET',
+                  url: '/projects',
+                  data: { typ: type, page:page },
+                  dataType: 'json',
+                  timeout: 300,
+                  success: function(data){
+                    that.data = data;
+                  },
+                  error: function(xhr, type){
+                    alert('Ajax error!')
+                  }
+                })
+            },
+            cacheDom: function(){
+                this.$nav = $('#navlist');
+                this.$list = $('#eventList');
+                this.$loadmore = $('#loadmore');
+                this.$myScroll = new IScroll('.home #wrapper', { scrollX: false, scrollY: true, click: true});
+            },
+            bindEvt: function(){
+                var that = this;
+                this.$nav.find('li').off().on('touchend', function(event) {
+                    $(this).addClass('active').siblings().removeClass('active');
+                    that.renderNav();
+                });
+                this.$list.find('li').children('.weui-panel').off().on('click', function(){
+                    var id = $(this).data('id');
+                    window.pageManager.go(id);
+                });
+                //关闭提示
+                $('#closeAlert').off().on('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $(this).parent().remove();
+                    navbar.refresh();
+                    $('.home #wrapper').css('top', '55px');
+                    that.$myScroll.refresh();
+                });
+                this.$loadmore.off().on('click', function(event) {
+                    event.preventDefault();
+                    that.showLoading();
+                    setTimeout(function(){
+                        that.renderList(that.data);
+                        that.hideLoading();
+                    }, 1500);
+                });
+            },
+            renderNav: function(){
+                var that = this;
+                this.$list.empty();
+                $.showLoading();
+                setTimeout(function () {
+                    $.hideLoading();
+                    that.renderList(that.data);
+                    that.$myScroll.scrollTo(0, 0, 800, IScroll.utils.ease.quadratic);
+                }, 1000);
+            },
+            renderList: function(d){
+                var that = this;
+                if (!!d) {
+                    for (var i = 0; i < d.length; i++) {
+                        var spec = '';
+                        for (var j = 0; j < d[i].spec.length; j++) {
+                            spec += '<span class="label label-red">'+d[i].spec[j]+'</span>';
+                        }
+                        var html = '<li>'
+                        +'      <div class="weui-panel" data-id="'+d[i].url+'">'
+                        +'          <div class="weui-panel__hd" id="content">'
+                        +'              <h4 class="weui-media-box__title mtitle">'+d[i].title+'</h4>'
+                        +'              <div class="grids">'
+                        +'                  <div class="grid grid-7">'
+                        +'                      <p class="weui-media-box__desc">'+d[i].loc+'</p>'
+                        +'                      <div class="mb5">'+spec+'</div>'
+                        +'                  </div>'
+                        +'                  <div class="grid grid-3 text-right">'
+                        +'                      <span class="text-red font24">'+d[i].price+'</span>'
+                        +'                  </div>'
+                        +'              </div>'
+                        +'          </div>'
+                        +'          <div class="weui-panel__bd">'
+                        +'              <div class="weui-media-box weui-media-box_text">'
+                        +'                  <ul class="weui-media-box__info">'
+                        +'                      <li class="weui-media-box__info__meta"><img src="'+d[i].sourceImg+'" style="vertical-align: middle; margin-top: -2px;" height="20" alt=""> '+d[i].source+'</li>'
+                        +'                      <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">'+d[i].time+'</li>'
+                        +'                  </ul>'
+                        +'              </div>'
+                        +'          </div>'
+                        +'      </div>'
+                        +'  </li>';
+                        this.$list.append(html);
+                    }
+                }else{
+                    window.pageManager.go("msg_warn");
+                }
+                this.$myScroll.refresh();
+                this.$list.find('li').children('.weui-panel').off('click').on('click', function(){
+                    var id = $(this).data('id');
+                    window.pageManager.go(id);
+                });
+            },
+            showLoading: function(){
+                this.$loadmore.addClass('loading').html('<span class="loader"></span> 正在加载中...');
+            },
+            hideLoading: function(){
+                this.$loadmore.removeClass('loading').html('加载更多');
+            },
+            init: function(){
+                var that = this, nav = '', w = 0;
+                this.cacheDom();
+                this.$nav.empty();
+                for (var i = 0; i < this.navdata.length; i++) {
+                    nav = '<li><a href="javascript:;">'+this.navdata[i]+'</a></li>';
+                    this.$nav.append(nav);
+                }
+                for (var i = 0; i < this.$nav.children().length; i++) {
+                    w += $(this.$nav.children()[i]).width();
+                }
+                this.$nav.parent().width(w+70);
+                this.$nav.children().first().addClass('active');
+                this.renderNav();
+                this.bindEvt();
+            }
+        }
+        creatlist.init();
+    });
+</script>
+</script>
+    <script type="text/html" id="tpl_filter">
+<div class="page">
+    <div class="wrapper" id="wrapper" style="padding: 0; bottom: 55px;">
+        <div class="scroller">
+            <div class="weui-cells">
+                <div class="weui_cell weui-cell_access" id="city-picker">
+                    <div class="weui_cell_hd"><label for="date" class="weui_label">选择城市</label></div>
+                    <div class="weui_cell_bd weui_cell_primary text-right text-grey" id="result">未选</div>
+                    <div class="weui-cell__ft">
+                        <span style="vertical-align:middle; font-size: 14px;"></span>
+                    </div>
+                  </div>
+            </div>
+            <div class="weui-panel weui-panel_access">
+                <div class="weui-panel__bd">
+                    <div class="weui-media-box weui-media-box_text">
+                        <h4 class="weui-media-box__title">热门城市 <span class="weui-fr text-grey font14" id="mylocation"><img src="images/location.png" alt="">我的位置</span></h4>
+                        <ul class="list-inline btn-group" id="hotCities">
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">北京</a></li>
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">上海</a></li>
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">广州</a></li>
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">深圳</a></li>
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">南京</a></li>
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">武汉</a></li>
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">成都</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="weui-panel weui-panel_access">
+                <div class="weui-panel__bd">
+                    <div class="weui-media-box weui-media-box_text">
+                        <h4 class="weui-media-box__title">房源类型</h4>
+                        <ul class="list-inline btn-group">
+                            <li class="active"><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">住宅</a></li>
+                            <li><a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default">写字楼</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="weui-cells weui-cells_checkbox">
+                <div class="weui-cell weui-cell_switch">
+                    <div class="weui-cell__bd">房源需求</div>
+                    <div class="weui-cell__ft">
+                        <span style="vertical-align:middle; font-size: 14px;margin-right: 10px;">设置价格</span>
+                        <label for="switchCP" class="weui-switch-cp" id="switchCP">
+                            <input class="weui-switch-cp__input" type="checkbox" />
+                            <div class="weui-switch-cp__box"></div>
+                        </label>
+                    </div>
+                </div>
+                <div class="weui-cell hide-cell">
+                    <label class="weui-check__label" for="s11">
+                        <div class="weui-cell__hd">
+                            <input type="checkbox" class="weui-check" name="checkbox1" id="s11" checked="checked">
+                            <i class="weui-icon-checked"></i>出售
+                        </div>
+                    </label>
+                    <label class="ml10">
+                        <span class="text-grey font14 text-2">最高单价</span><input class="weui-input" type="text" placeholder=""><span class="text-grey font14">元/㎡</span>
+                    </label>
+                    <label class="ml10">
+                        <span class="text-grey font14 text-2">最低总价</span><input class="weui-input" type="text" placeholder=""><span class="text-grey font14">万元</span>
+                    </label>
+                </div>
+                <div class="weui-cell hide-cell">
+                    <label class="weui-check__label" for="s12">
+                        <div class="weui-cell__hd">
+                            <input type="checkbox" class="weui-check" name="checkbox1" id="s12">
+                            <i class="weui-icon-checked"></i>出租
+                        </div>
+                    </label>
+                    <label class="ml10">
+                        <span class="text-grey font14 text-2">最低单价</span><input class="weui-input" type="text" placeholder=""><span class="text-grey font14">元/月</span>
+                    </label>
+                </div>
+                <div class="weui-cell hide-cell">
+                    <label class="weui-check__label" for="s13">
+                        <div class="weui-cell__hd">
+                            <input type="checkbox" class="weui-check" name="checkbox1" id="s13">
+                            <i class="weui-icon-checked"></i>求购
+                        </div>
+                    </label>
+                    <label class="ml10">
+                        <span class="text-grey font14 text-2">最高总价</span><input class="weui-input" type="text" placeholder=""><span class="text-grey font14">万元</span>
+                    </label>
+                    <label class="ml10">
+                        <span class="text-grey font14 text-2">最高单价</span><input class="weui-input" type="text" placeholder=""><span class="text-grey font14">元/㎡</span>
+                    </label>
+                </div>
+                <div class="weui-cell hide-cell">
+                    <label class="weui-check__label" for="s14">
+                        <div class="weui-cell__hd">
+                            <input type="checkbox" class="weui-check" name="checkbox1" id="s14">
+                            <i class="weui-icon-checked"></i>求租
+                        </div>
+                    </label>
+                    <label class="ml10">
+                        <span class="text-grey font14 text-2">最高单价</span><input class="weui-input" type="text" placeholder=""><span class="text-grey font14">元/月</span>
+                    </label>
+                </div>
+            </div>
+            <div class="spacing"></div>
+        </div>
+    </div>
+    <div id="my-area" class="am-popup">
+        <div id="cities"></div>
+    </div>
+    <div class="btn-bottom">
+        <a href="javascript:;" class="btn btn-disabled" id="saveBtn">保存设置</a>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        $('.hide-cell').hide();
+        var myScroll02 = new IScroll('.filter #wrapper', { scrollX: false, scrollY: true, click: true});
+        //热门城市, 房源类型
+        $('.btn-group').each(function(index, el) {
+            var $this = $(this);
+            $this.children('li').click(function(event) {
+                $this.children('li').removeClass('active');
+                $(this).addClass('active');
+                if ($this.attr('id') == "hotCities") {
+                    var txt = $(this).text();
+                    $('#result').html(txt);
+                }
+            });
+        });
+        $('#mylocation').click(function(event) {
+            $.showLoading();
+            setTimeout(function(){
+                $.hideLoading();
+                $('#result').html('武汉');
+                $('#hotCities').find('li').removeClass('active');
+            }, 1000);
+        });
+        $.confirm("获取您所在的位置？", function() {
+            $('#result').html('武汉');
+        }, function() {
+          //点击取消后的回调函数
+        });
+        //选择城市
+        $("#city-picker").on('click', function(event) {
+            event.preventDefault();
+            $('#my-area').fadeIn(function(){
+                $("#cities").CityPicker({
+                  getCity: function(pro, city){
+                    $('#result').html(pro + ' ' + city);
+                    $('#hotCities').find('li').removeClass('active');
+                    $('#my-area').fadeOut();
+                    $('#cities').empty();
+                  }
+                });
+            });
+        });
+
+        //设置价格
+        $('#switchCP').on('click', function(event) {
+            event.preventDefault();
+            var switchbox = $(this).find('input[type="checkbox"]');
+            if (switchbox.prop('checked') == true) {
+                switchbox.prop('checked', false).removeAttr('checked');
+                $('.hide-cell').hide();
+                $('#saveBtn').addClass('btn-disabled').removeClass('btn-danger').off();
+            }else{
+                switchbox.prop('checked', true).attr('checked', 'checked');
+                $('.hide-cell').show();
+                $('.hide-cell .weui-check__label').each(function(index, el) {
+                    $(this).on('click', function(event) {
+                        event.preventDefault();
+                        var checkbox = $(this).find('input[type="checkbox"]');
+                        if (checkbox.prop('checked') == true) {
+                            checkbox.prop('checked', false).removeAttr('checked');
+                        }else{
+                            checkbox.prop('checked', true).attr('checked', 'checked');
+                        }
+                    });
+                });
+                $('#saveBtn').addClass('btn-danger').removeClass('btn-disabled').on('click', function(){
+                    if ($("#result").html() == "未选") {
+                        $.toast("您还未选择城市", "text");
+                    }else{
+                        $.toast("操作成功");
+                        setTimeout(function(){
+                            window.pageManager.go("home");
+                        }, 2500);
+                    }
+                });
+            }
+            myScroll02.refresh();
+        });    
+    });
+</script>
+</script>
+    <script type="text/html" id="tpl_details">
+<div class="page">
+    <div class="wrapper" id="wrapper" style="padding: 0;bottom: 55px;">
+        <div class="scroller">
+            <a class="alert alert_warning" onclick="window.pageManager.go('user');">限时9元加入会员，立享多渠道个人房源推送 > <span class="close" id="closeAlert">X</span></a>
+            <!-- Swiper -->
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide"><img src="images/img.png" alt=""></div>
+                    <div class="swiper-slide"><img src="images/img.png" alt=""></div>
+                    <div class="swiper-slide"><img src="images/img.png" alt=""></div>
+                </div>
+                <!-- Add Pagination -->
+                <div class="swiper-pagination"></div>
+            </div>
+            <div class="weui-panel">
+                <div class="weui-panel__hd" id="content">
+                    <h4 class="weui-media-box__title mtitle">九峰社区德欣里 3室2厅1卫</h4>
+                    <div class="grids">
+                        <div class="grid grid-7">
+                            <p class="weui-media-box__desc">常青-金盾花园</p>
+                            <div class="mb5">
+                                <span class="label label-red">住宅</span>
+                                <span class="label label-red">148㎡</span>
+                                <span class="label label-red">4室2厅2卫</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-3 text-right">
+                            <span class="text-red font24">87万</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="weui-panel__bd">
+                    <div class="weui-media-box weui-media-box_text">
+                        <ul class="weui-media-box__info">
+                            <li class="weui-media-box__info__meta"><img src="images/icon_tabbar.png" style="vertical-align: middle; margin-top: -2px;" height="20" alt=""> 赶集网</li>
+                            <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">1分钟前发布</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="weui-panel">
+                <div class="weui-panel__hasbtn">
+                    <div class="weui-panel__hd">
+                        <h4 class="weui-media-box__title mbn mtitle">131029203923</h4>
+                        <span>联系人：李女士</span>
+                    </div>
+                    <div class="btns">
+                        <a href="javascript:;" class="btn btn-phone"></a>
+                        <a href="javascript:;" class="btn btn-chat"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="weui-panel">
+                <div class="weui-panel__hd">
+                    <span class="text-grey">长江之滨，二环之内，地铁5号线边上，温馨居家环境，上有架空层可改为复式结构，轻松改变家居环境，余家头小学，武汉理工大学，理想学区房，武商量贩店，华润橡树湾商业区紧邻。是你购房居家升值首选楼盘</span>
+                </div>
+                <div class="weui-panel__ft">
+                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link">
+                        <div class="weui-cell__bd">
+                            <ul class="list-photo">
+                                <li><img src="images/icon_tabbar.png" alt=""></li>
+                                <li><img src="images/icon_tabbar.png" alt=""></li>
+                                <li><img src="images/icon_tabbar.png" alt=""></li>
+                            </ul>
+                        </div>
+                        <span class="weui-cell__ft">等9个人浏览过</span>
+                    </a>    
+                </div>
+            </div>
+            <div class="spacing"></div>
+        </div>
+    </div>
+    <div class="btn-bottom has-btn-left">
+        <a href="javascript:;" class="btn btn-report" id="reportBtn"></a>
+        <a href="javascript:;" class="btn btn-danger">阅读原文</a>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        var myScroll02;
+        var swiper = new Swiper('.swiper-container', {
+            pagination: '.swiper-pagination',
+            slidesPerView: 1,
+            paginationClickable: true,
+            spaceBetween: 30,
+            loop: true,
+            onInit: function(swiper){
+                setTimeout(function(){
+                    myScroll02 = new IScroll('.details #wrapper', { scrollX: false, scrollY: true, click: true});
+                }, 300);
+            }
+        });
+        $('.details #closeAlert').on('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $(this).parent().remove();
+            myScroll02.refresh();
+        });
+        $('.details #reportBtn').on('click', function(event) {
+            event.preventDefault();
+            $.modal({
+                title: "举报虚假房源",
+                text: "共同维护社区信息，提供更好更真实有效的房源。",
+                buttons: [
+                    { text: "中介冒充个人", onClick: function(){ console.log(1)} },
+                    { text: "虚假房源广告", 
+                        onClick: function(){ 
+                            $('.details .mtitle').each(function(index, el) {
+                                var txt = $(this).text();
+                                $(this).html('<del class="text-grey">'+txt+'</del>');
+                            });
+                            if ($('.details #content').find('.stamp').length < 1) {
+                                $('.details #content').append('<span class="stamp"></span>');
+                            }
+                            $('.details .btn-phone').css({
+                                'background': 'url(images/icon-phone-grey.png) center no-repeat',
+                                'background-size': '36px auto'
+                            }).off();
+                            $('.details .btn-chat').css({
+                                'background': 'url(images/icon-chat-grey.png) center no-repeat',
+                                'background-size': '36px auto'
+                            }).off();
+                        } 
+                    }
+                ]
+            });
+            $('.details .weui_mask').on('click', function(event) {
+                event.preventDefault();
+                $.closeModal();
+            });
+        });
+        // $('.js_item').on('click', function(){
+        //     var id = $(this).data('id');
+        //     window.pageManager.go(id);
+        // });
+    });
+</script>
+</script>
+    <script type="text/html" id="tpl_user">
+<div class="page">
+    <div class="alert alert_danger">会员到期时间：</div>
+    <div class="page__bd page__bd_spacing">
+        <p>开通会员立享<span class="text-red">58同城、赶集网、房天下、亿房网、百姓网等多渠道个人房源信息！</span></p>
+    </div>
+    <div class="wrapper" id="wrapper" style="top: 135px;">
+        <div class="scroller">
+            <ul class="list_discount"></ul>
+            <div class="spacing"></div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        var $user = $('.user'), list = '';
+        var data = {
+                isUser:true,
+                expired:"2016年12月21日 21:32:21",
+                discount:[
+                    {
+                        id:1,
+                        dis:"9元",
+                        old:"15元",
+                        new:"6折"
+                    },
+                    {
+                        id:2,
+                        dis:"25",
+                        old:"45元",
+                        new:"5折"
+                    },
+                    {
+                        id:3,
+                        dis:"7元",
+                        old:"15元",
+                        new:"6折"
+                    },
+                    {
+                        id:4,
+                        dis:"7元",
+                        old:"15元",
+                        new:"6折"
+                    },
+                    {
+                        id:5,
+                        dis:"7元",
+                        old:"15元",
+                        new:"6折"
+                    },
+                    {
+                        id:6,
+                        dis:"7元",
+                        old:"15元",
+                        new:"6折"
+                    },
+                    {
+                        id:7,
+                        dis:"7元",
+                        old:"15元",
+                        new:"6折"
+                    }
+                ]
+            };
+            if (data.isUser) {
+                $user.find('.alert').html('会员到期时间：' + data.expired);
+            }else{
+                $user.find('.alert').html('暂未开通会员');
+            }
+            for (var i = 0; i < data.discount.length; i++) {
+                var html = '<li><a href="javascript:;">'+data.discount[i].dis+'/月<span><del>原价'+data.discount[i].old+'</del> 立享'+data.discount[i].new+'优惠</span></a></li>';
+                list += html;
+            }
+            $user.find('.list_discount').html(list);
+            var myScroll02 = new IScroll('.user #wrapper', { scrollX: false, scrollY: true, click: true});
+    });
+</script>
+</script>
+    <script type="text/html" id="tpl_msg_success">
+<div class="page">
+    <div class="weui-msg">
+        <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+        <div class="weui-msg__text-area">
+            <h2 class="weui-msg__title">操作成功</h2>
+            <p class="weui-msg__desc">内容详情，可根据实际需要安排，如果换行则不超过规定长度，居中展现<a href="javascript:void(0);">文字链接</a></p>
+        </div>
+        <div class="weui-msg__opr-area">
+            <p class="weui-btn-area">
+                <a href="javascript:history.back();" class="weui-btn weui-btn_primary">推荐操作</a>
+                <a href="javascript:history.back();" class="weui-btn weui-btn_default">辅助操作</a>
+            </p>
+        </div>
+        <div class="weui-msg__extra-area">
+            <div class="weui-footer">
+                <p class="weui-footer__links">
+                    <a href="javascript:void(0);" class="weui-footer__link">底部链接文本</a>
+                </p>
+                <p class="weui-footer__text">Copyright &copy; 2016 mfang</p>
+            </div>
+        </div>
+    </div>
+</div>
+</script>
+    <script type="text/html" id="tpl_msg_warn">
+<div class="page">
+    <div class="weui-msg">
+        <div class="weui-msg__icon-area"><i class="weui-icon-warn weui-icon_msg"></i></div>
+        <div class="weui-msg__text-area">
+            <h2 class="weui-msg__title">操作失败</h2>
+            <p class="weui-msg__desc">内容详情，可根据实际需要安排，如果换行则不超过规定长度，居中展现<a href="javascript:void(0);">文字链接</a></p>
+        </div>
+        <div class="weui-msg__opr-area">
+            <p class="weui-btn-area">
+                <a href="javascript:history.back();" class="weui-btn weui-btn_primary">推荐操作</a>
+                <a href="javascript:history.back();" class="weui-btn weui-btn_default">辅助操作</a>
+            </p>
+        </div>
+        <div class="weui-msg__extra-area">
+            <div class="weui-footer">
+                <p class="weui-footer__links">
+                    <a href="javascript:void(0);" class="weui-footer__link">底部链接文本</a>
+                </p>
+                <p class="weui-footer__text">Copyright &copy; 2016 mfang</p>
+            </div>
+        </div>
+    </div>
+</div>
+</script>
+    <script src="./zepto.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="./weui.min.js"></script>
+    <script src="./jquery-weui.min.js"></script>
+    <script src="./iscroll.js"></script>
+    <script src="./swiper.min.js"></script>
+    <script src="./cityPicker.js"></script>
+    <script src="./example.js"></script>
+</body>
+</html>

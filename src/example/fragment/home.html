@@ -1,0 +1,208 @@
+<div class="page">
+    <a class="alert alert_warning" onclick="window.pageManager.go('user');">限时9元加入会员，立享多渠道个人房源推送 > <span class="close" id="closeAlert">X</span></a>
+    <div class="wrapper" id="navbar" style="position: relative; padding: 0; padding-right: 60px; height: 55px; background-color: #f15846;">
+        <div class="scroller" style="position: absolute; width: 380px;">
+            <ul class="list-nav" id="navlist"></ul>
+        </div>
+        <a href="javascript:;"  onclick="window.pageManager.go('filter');" class="btn-filter" style="position: absolute; right: 0; top: 0; z-index: 10;"></a>
+    </div>
+    <div class="wrapper" id="wrapper" style="padding: 0; top: 100px;">
+        <div class="scroller">
+            <ul id="eventList"></ul>
+            <a href="javascript:;" class="weui-btn-link text-grey" id="loadmore">加载更多</a>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        var navbar = new IScroll('#navbar', { scrollX: true, scrollY: false, click: true});
+        
+        //点击导航，加载列表
+        var creatlist = {
+            data:[
+                {
+                    id:1,
+                    url:"details",
+                    title:"九峰社区德欣里 3室2厅1卫",
+                    loc:"常青-金盾花园",
+                    spec:["住宅","148㎡","4室2厅2卫"],
+                    price:"87万",
+                    sourceImg:"images/icon_tabbar.png",
+                    source:"赶集网",
+                    time:"1分钟前发布"
+                },
+                {
+                    id:2,
+                    url:"details",
+                    title:"九峰社区德欣里 3室2厅1卫",
+                    loc:"常青-金盾花园",
+                    spec:["住宅","148㎡","4室2厅2卫"],
+                    price:"53.2万",
+                    sourceImg:"images/icon_tabbar.png",
+                    source:"赶集网",
+                    time:"1分钟前发布"
+                },
+                {
+                    id:3,
+                    url:"details",
+                    title:"九峰社区德欣里 3室2厅1卫",
+                    loc:"常青-金盾花园",
+                    spec:["住宅","148㎡","4室2厅2卫"],
+                    price:"64.3万",
+                    sourceImg:"images/icon_tabbar.png",
+                    source:"赶集网",
+                    time:"1分钟前发布"
+                },
+                {
+                    id:4,
+                    url:"details",
+                    title:"九峰社区德欣里 3室2厅1卫",
+                    loc:"常青-金盾花园",
+                    spec:["住宅","148㎡","4室2厅2卫"],
+                    price:"124.4万",
+                    sourceImg:"images/icon_tabbar.png",
+                    source:"赶集网",
+                    time:"1分钟前发布"
+                },
+                {
+                    id:5,
+                    url:"details",
+                    title:"九峰社区德欣里 3室2厅1卫",
+                    loc:"常青-金盾花园",
+                    spec:["住宅","148㎡","4室2厅2卫"],
+                    price:"122.2万",
+                    sourceImg:"images/icon_tabbar.png",
+                    source:"赶集网",
+                    time:"1分钟前发布"
+                }
+            ],
+            navdata:["全部", "出租", "出售", "求购", "求租"],
+            getData: function(type, page){
+                var that = this;
+                $.ajax({
+                  type: 'GET',
+                  url: '/projects',
+                  data: { typ: type, page:page },
+                  dataType: 'json',
+                  timeout: 300,
+                  success: function(data){
+                    that.data = data;
+                  },
+                  error: function(xhr, type){
+                    alert('Ajax error!')
+                  }
+                })
+            },
+            cacheDom: function(){
+                this.$nav = $('#navlist');
+                this.$list = $('#eventList');
+                this.$loadmore = $('#loadmore');
+                this.$myScroll = new IScroll('.home #wrapper', { scrollX: false, scrollY: true, click: true});
+            },
+            bindEvt: function(){
+                var that = this;
+                this.$nav.find('li').off().on('touchend', function(event) {
+                    $(this).addClass('active').siblings().removeClass('active');
+                    that.renderNav();
+                });
+                this.$list.find('li').children('.weui-panel').off().on('click', function(){
+                    var id = $(this).data('id');
+                    window.pageManager.go(id);
+                });
+                //关闭提示
+                $('#closeAlert').off().on('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $(this).parent().remove();
+                    navbar.refresh();
+                    $('.home #wrapper').css('top', '55px');
+                    that.$myScroll.refresh();
+                });
+                this.$loadmore.off().on('click', function(event) {
+                    event.preventDefault();
+                    that.showLoading();
+                    setTimeout(function(){
+                        that.renderList(that.data);
+                        that.hideLoading();
+                    }, 1500);
+                });
+            },
+            renderNav: function(){
+                var that = this;
+                this.$list.empty();
+                $.showLoading();
+                setTimeout(function () {
+                    $.hideLoading();
+                    that.renderList(that.data);
+                    that.$myScroll.scrollTo(0, 0, 800, IScroll.utils.ease.quadratic);
+                }, 1000);
+            },
+            renderList: function(d){
+                var that = this;
+                if (!!d) {
+                    for (var i = 0; i < d.length; i++) {
+                        var spec = '';
+                        for (var j = 0; j < d[i].spec.length; j++) {
+                            spec += '<span class="label label-red">'+d[i].spec[j]+'</span>';
+                        }
+                        var html = '<li>'
+                        +'      <div class="weui-panel" data-id="'+d[i].url+'">'
+                        +'          <div class="weui-panel__hd" id="content">'
+                        +'              <h4 class="weui-media-box__title mtitle">'+d[i].title+'</h4>'
+                        +'              <div class="grids">'
+                        +'                  <div class="grid grid-7">'
+                        +'                      <p class="weui-media-box__desc">'+d[i].loc+'</p>'
+                        +'                      <div class="mb5">'+spec+'</div>'
+                        +'                  </div>'
+                        +'                  <div class="grid grid-3 text-right">'
+                        +'                      <span class="text-red font24">'+d[i].price+'</span>'
+                        +'                  </div>'
+                        +'              </div>'
+                        +'          </div>'
+                        +'          <div class="weui-panel__bd">'
+                        +'              <div class="weui-media-box weui-media-box_text">'
+                        +'                  <ul class="weui-media-box__info">'
+                        +'                      <li class="weui-media-box__info__meta"><img src="'+d[i].sourceImg+'" style="vertical-align: middle; margin-top: -2px;" height="20" alt=""> '+d[i].source+'</li>'
+                        +'                      <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">'+d[i].time+'</li>'
+                        +'                  </ul>'
+                        +'              </div>'
+                        +'          </div>'
+                        +'      </div>'
+                        +'  </li>';
+                        this.$list.append(html);
+                    }
+                }else{
+                    window.pageManager.go("msg_warn");
+                }
+                this.$myScroll.refresh();
+                this.$list.find('li').children('.weui-panel').off('click').on('click', function(){
+                    var id = $(this).data('id');
+                    window.pageManager.go(id);
+                });
+            },
+            showLoading: function(){
+                this.$loadmore.addClass('loading').html('<span class="loader"></span> 正在加载中...');
+            },
+            hideLoading: function(){
+                this.$loadmore.removeClass('loading').html('加载更多');
+            },
+            init: function(){
+                var that = this, nav = '', w = 0;
+                this.cacheDom();
+                this.$nav.empty();
+                for (var i = 0; i < this.navdata.length; i++) {
+                    nav = '<li><a href="javascript:;">'+this.navdata[i]+'</a></li>';
+                    this.$nav.append(nav);
+                }
+                for (var i = 0; i < this.$nav.children().length; i++) {
+                    w += $(this.$nav.children()[i]).width();
+                }
+                this.$nav.parent().width(w+70);
+                this.$nav.children().first().addClass('active');
+                this.renderNav();
+                this.bindEvt();
+            }
+        }
+        creatlist.init();
+    });
+</script>

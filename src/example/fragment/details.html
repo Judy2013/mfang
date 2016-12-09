@@ -1,0 +1,137 @@
+<div class="page">
+    <div class="wrapper" id="wrapper" style="padding: 0;bottom: 55px;">
+        <div class="scroller">
+            <a class="alert alert_warning" onclick="window.pageManager.go('user');">限时9元加入会员，立享多渠道个人房源推送 > <span class="close" id="closeAlert">X</span></a>
+            <!-- Swiper -->
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide"><img src="images/img.png" alt=""></div>
+                    <div class="swiper-slide"><img src="images/img.png" alt=""></div>
+                    <div class="swiper-slide"><img src="images/img.png" alt=""></div>
+                </div>
+                <!-- Add Pagination -->
+                <div class="swiper-pagination"></div>
+            </div>
+            <div class="weui-panel">
+                <div class="weui-panel__hd" id="content">
+                    <h4 class="weui-media-box__title mtitle">九峰社区德欣里 3室2厅1卫</h4>
+                    <div class="grids">
+                        <div class="grid grid-7">
+                            <p class="weui-media-box__desc">常青-金盾花园</p>
+                            <div class="mb5">
+                                <span class="label label-red">住宅</span>
+                                <span class="label label-red">148㎡</span>
+                                <span class="label label-red">4室2厅2卫</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-3 text-right">
+                            <span class="text-red font24">87万</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="weui-panel__bd">
+                    <div class="weui-media-box weui-media-box_text">
+                        <ul class="weui-media-box__info">
+                            <li class="weui-media-box__info__meta"><img src="images/icon_tabbar.png" style="vertical-align: middle; margin-top: -2px;" height="20" alt=""> 赶集网</li>
+                            <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">1分钟前发布</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="weui-panel">
+                <div class="weui-panel__hasbtn">
+                    <div class="weui-panel__hd">
+                        <h4 class="weui-media-box__title mbn mtitle">131029203923</h4>
+                        <span>联系人：李女士</span>
+                    </div>
+                    <div class="btns">
+                        <a href="javascript:;" class="btn btn-phone"></a>
+                        <a href="javascript:;" class="btn btn-chat"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="weui-panel">
+                <div class="weui-panel__hd">
+                    <span class="text-grey">长江之滨，二环之内，地铁5号线边上，温馨居家环境，上有架空层可改为复式结构，轻松改变家居环境，余家头小学，武汉理工大学，理想学区房，武商量贩店，华润橡树湾商业区紧邻。是你购房居家升值首选楼盘</span>
+                </div>
+                <div class="weui-panel__ft">
+                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link">
+                        <div class="weui-cell__bd">
+                            <ul class="list-photo">
+                                <li><img src="images/icon_tabbar.png" alt=""></li>
+                                <li><img src="images/icon_tabbar.png" alt=""></li>
+                                <li><img src="images/icon_tabbar.png" alt=""></li>
+                            </ul>
+                        </div>
+                        <span class="weui-cell__ft">等9个人浏览过</span>
+                    </a>    
+                </div>
+            </div>
+            <div class="spacing"></div>
+        </div>
+    </div>
+    <div class="btn-bottom has-btn-left">
+        <a href="javascript:;" class="btn btn-report" id="reportBtn"></a>
+        <a href="javascript:;" class="btn btn-danger">阅读原文</a>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        var myScroll02;
+        var swiper = new Swiper('.swiper-container', {
+            pagination: '.swiper-pagination',
+            slidesPerView: 1,
+            paginationClickable: true,
+            spaceBetween: 30,
+            loop: true,
+            onInit: function(swiper){
+                setTimeout(function(){
+                    myScroll02 = new IScroll('.details #wrapper', { scrollX: false, scrollY: true, click: true});
+                }, 300);
+            }
+        });
+        $('.details #closeAlert').on('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $(this).parent().remove();
+            myScroll02.refresh();
+        });
+        $('.details #reportBtn').on('click', function(event) {
+            event.preventDefault();
+            $.modal({
+                title: "举报虚假房源",
+                text: "共同维护社区信息，提供更好更真实有效的房源。",
+                buttons: [
+                    { text: "中介冒充个人", onClick: function(){ console.log(1)} },
+                    { text: "虚假房源广告", 
+                        onClick: function(){ 
+                            $('.details .mtitle').each(function(index, el) {
+                                var txt = $(this).text();
+                                $(this).html('<del class="text-grey">'+txt+'</del>');
+                            });
+                            if ($('.details #content').find('.stamp').length < 1) {
+                                $('.details #content').append('<span class="stamp"></span>');
+                            }
+                            $('.details .btn-phone').css({
+                                'background': 'url(images/icon-phone-grey.png) center no-repeat',
+                                'background-size': '36px auto'
+                            }).off();
+                            $('.details .btn-chat').css({
+                                'background': 'url(images/icon-chat-grey.png) center no-repeat',
+                                'background-size': '36px auto'
+                            }).off();
+                        } 
+                    }
+                ]
+            });
+            $('.details .weui_mask').on('click', function(event) {
+                event.preventDefault();
+                $.closeModal();
+            });
+        });
+        // $('.js_item').on('click', function(){
+        //     var id = $(this).data('id');
+        //     window.pageManager.go(id);
+        // });
+    });
+</script>
