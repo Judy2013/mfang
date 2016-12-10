@@ -573,7 +573,22 @@ p{
 /*::-webkit-scrollbar {*/
     /*width: 0;*/
 /*}*/
-
+.picker-box .prompt {
+    display: block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 18px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    text-align: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
 .picker-box dt {
     background-color: #f2f2f2;
     padding: 8px 20px;
@@ -616,10 +631,11 @@ p{
     display: block;
     text-align: center;
     color: #0572e2;
+    padding: 2px 0;
 }
 
 .navbar.active {
-    background-color: grey;
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
 .navbar.active a {

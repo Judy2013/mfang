@@ -108,7 +108,7 @@ var provinces = {
                     }
                 }
 
-                proBox = "<section class='pro-picker'>" + dl + "</section>";
+                proBox = "<section class='pro-picker'><div class='box'>" + dl + "</div></section>";
 
                 $(".picker-box").append(proBox);
             },
@@ -163,11 +163,13 @@ var provinces = {
                 });
             },
             createNavBar: function () {
-                var str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                var arr = str.split("");
+                var arr = [];
+                for (var letterKey in this.provinces) {
+                    arr.push(letterKey);
+                }
                 var a = "";
                 arr.forEach(function (item, i) {
-                    a += '<a href="#' + item + '">' + item + '</a>';
+                    a += '<a data-to="#' + item + '">' + item + '</a>';
                 });
 
                 var div = '<div class="navbar">' + a + '</div>';
@@ -179,29 +181,37 @@ var provinces = {
                 var navBar = $(".navbar");
                 var width = navBar.find("a").width();
                 var height = navBar.find("a").height();
+                var topArray = [];
+                $('.box').find("dt").each(function (i, item) {
+                    var offset = $(item).offset();
+                    var top = offset.top;
+                    topArray.push(top);
+                });
                 navBar.on("touchstart", function (e) {
                     $(this).addClass("active");
                     that.createLetterPrompt($(e.target).html());
+                    var targetOffset = topArray[$(e.target).index()];
+                    $('.pro-picker').scrollTop(targetOffset);
                 });
 
-                navBar.on("touchmove", function (e) {
-                    e.preventDefault();
-                    var touch = e.originalEvent.touches[0];
-                    var pos = {"x": touch.pageX, "y": touch.pageY};
-                    var x = pos.x, y = pos.y;
-                    $(this).find("a").each(function (i, item) {
-                        var offset = $(item).offset();
-                        var left = offset.left, top = offset.top;
-                        if (x > left && x < (left + width) && y > top && y < (top + height)) {
-                            location.href = item.href;
-                            that.changeLetter($(item).html());
-                        }
-                    });
-                });
+                // navBar.on("touchmove", function (e) {
+                //     e.preventDefault();
+                //     var touch = e.originalEvent.touches[0];
+                //     var pos = {"x": touch.pageX, "y": touch.pageY};
+                //     var x = pos.x, y = pos.y;
+                //     $(this).find("a").each(function (i, item) {
+                //         var offset = $(item).offset();
+                //         var left = offset.left, top = offset.top;
+                //         if (x > left && x < (left + width) && y > top && y < (top + height)) {
+                //             // location.href = item.href;
+                //             that.changeLetter($(item).html());
+                //         }
+                //     });
+                // });
 
                 navBar.on("touchend", function () {
                     $(this).removeClass("active");
-                    $(".prompt").hide();
+                    $(".prompt").remove();
                 })
             },
             createLetterPrompt: function (letter) {
